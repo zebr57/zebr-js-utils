@@ -51,7 +51,7 @@
 12. 数组中键值最大的一项 `arrMaxByKey`
 13. 数组中键值最小的一项 `arrMinByKey`
 
-## tree [{children}]
+## 树结构 [{children}]
 
 1. 查找所有父节点 id(key) `findParentKey`
 2. 查找子节点 `findNode`
