@@ -1,5 +1,9 @@
 # js-utils 工作中常用的一些数据操作
 
+支持按需引入
+
+文档说明、注释清晰
+
 ## is 判断
 
 1. 类型判断 `typeOf`
@@ -27,10 +31,10 @@
 
 ## 对象 {}
 
-1. 清除值为'' 或 null 的字段 `clearEmptyParams()`
-2. 设置所需的字段值 `setDefaultParams()`
-3. 替换键名 `replaceKeys()`
-4. 通过 JSON 拷贝 `jsonClone()`
+1. 清除值为'' 或 null 的字段 `clearEmptyParams`
+2. 设置所需的字段值 `setDefaultParams`
+3. 替换键名 `replaceKeys`
+4. 通过 JSON 拷贝 `jsonClone`
 5. 对象深拷贝 `deepClone`
 6. 选出指定字段值 `pickParams`
 7. 合并对象 `mergeParams`
@@ -76,3 +80,7 @@
 ## 代码
 
 本仓库 src/utils.js
+
+## 文档
+
+https://shen-linqiang.gitee.io/blog-vitepress/frontend/utils-lib/
