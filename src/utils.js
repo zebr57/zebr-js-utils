@@ -103,7 +103,7 @@ export function subtract() {
  * @param {number} arguments 第一个参数为被除数，剩余参数为除数
  * @return {number}
  */
-export function divide(dividend, divisor) {
+export function divide() {
   try {
     if (arguments.length < 2) throw "divide() params without dividend or divisor";
     let result = arguments[0];
@@ -136,31 +136,29 @@ export function multiply() {
     console.error(error);
   }
 }
-/**
- * @description: 向下精确小数位数
- * @param {number} number 向下取整的数字
- * @param {number} toFixed 精确位数
- * @return {*}
- */
-export function floor(number, precision = 0) {
-  return number.toFixed(precision);
-}
-export function round(number, precision = 0) {}
 
 /* ===================================== 数字 or 字符串 ===================================== */
 /**
  * @description: 单位数字前面补0
  * @param {*} num 数字
- * @return {*} padleft(8) => 08
+ * @return {string} 返回处理好的字符串
+ * @example
+ * padLeft(8) // '08'
  */
-export function padleft(num) {
-  return (String(num)[1] && String(num)) || "0" + num;
+export function padLeft(num) {
+  if (isNaN(num * 1)) {
+    return num;
+  } else {
+    return (String(num)[1] && String(num)) || "0" + num;
+  }
 }
 
 /**
  * @description: 转译html字符
  * @param {string} htmlStr html内容
  * @return {string} 转译结果
+ * @example
+ * htmlEscape(`<div>hello</div>`) // &lt;div&gt;hello&lt;/div&gt;
  */
 export function htmlEscape(htmlStr) {
   let reg = /(<|>)/g;
@@ -183,7 +181,7 @@ export function htmlEscape(htmlStr) {
  * @example 
  *  const text = "utils 支持多种下载方式。"
     const style = `fontWeight: bold ;color: #333;`
-    const res = textHtmlTag(text, '支持', style)
+    const res = textHighlight(text, '支持', style)
     res => 'utils <span  class="highlight" style="">支持</span>多种下载方式。'
  */
 export function textHighlight(text, content, style = "", className = "highlight") {
@@ -197,9 +195,9 @@ export function textHighlight(text, content, style = "", className = "highlight"
  * @param {string} str
  * @param {number} num
  * @return {array}
- * divideStr(’abcdef‘, 2) // [’ab','cd','ef‘]
+ * sliceStr(’abcdef‘, 2) // [’ab','cd','ef‘]
  */
-export function divideStr(str, len) {
+export function sliceStr(str, len) {
   let arr = [];
   let index = 0;
   while (index < str.length) {
@@ -215,6 +213,9 @@ export function divideStr(str, len) {
  * @param {string} fnType pure（纯）| effect（虚），默认pure.
  * @param {boolean} isIncludeNull  是否清除null，默认true.
  * @return {object} params 处理好的参数对象
+ * @example
+ * const obj = { name: "", age: 18, gender: 0 };
+ * const res = clearEmptyParams(obj); // {age: 18, gender: 0}
  */
 export function clearEmptyParams(params, fnType = "pure", isIncludeNull = true) {
   if (!(params instanceof Object)) {
@@ -229,7 +230,6 @@ export function clearEmptyParams(params, fnType = "pure", isIncludeNull = true) 
   for (let i = 0; i < paramsKeys.length; i++) {
     let key = paramsKeys[i];
     let value = params[key];
-    console.log(key, value);
     if ((!value && typeof value == "string") || (value == null && isIncludeNull)) {
       delete params[key];
     }
@@ -238,11 +238,15 @@ export function clearEmptyParams(params, fnType = "pure", isIncludeNull = true) 
 }
 
 /**
- * @description: 设置需要的字段值
+ * @description: 给对象属性设置默认值
  * @param {object} params 设置对象.
  * @param {object} data 获取对象.
  * @param {string} fnType pure（纯）| effect（虚），默认pure.
  * @return {object} params 处理好的参数对象
+ * @example
+ * const obj = { name: "", age: 18, gender: 0 };
+ * const defaultObj = { name: "王花花", age: 20, like: "code" };
+ * const res = setDefaultParams(obj, defaultObj); // {name: '王花花', age: 20, gender: 0}
  */
 export function setDefaultParams(params, data, fnType = "pure") {
   if (!(data instanceof Object)) {
@@ -266,16 +270,17 @@ export function setDefaultParams(params, data, fnType = "pure") {
       }
     }
   }
-  console.log("setDefaultParams", params);
   return params;
 }
 
 /**
- * @description: 传入需要更换的对象和一个字段对应的 map，返回替换结果
+ * @description: 替换对象键名，传入需要更换的对象和一个字段对应的 map，返回替换结果
  * @param {object} params 替换对象.
  * @param {object} keysMap 键名映射.
  * @param {string} fnType pure（纯）| effect（虚），默认pure.
  * @return {object} params 处理好的参数对象
+ * @example
+ * const res = replaceKeys(obj, { name: "userName", gender: "sex" }); // {age: 18, userName: '', sex: 0}
  */
 export function replaceKeys(params, keysMap = {}, fnType = "pure") {
   if (!(params instanceof Object)) {
@@ -312,9 +317,12 @@ export function jsonClone(target) {
  * @param {object|array} target 目标对象
  * @param {string} type 'obj' or 'arr'
  * @return {*} 拷贝结果对象
+ * @example
+ * const res = deepClone(obj);
  */
-export function deepClone(target, type) {
+export function deepClone(target, type = "obj") {
   let result = type == "obj" ? {} : [];
+  console.log(result);
   if (target instanceof Object) {
     let toStr = Object.prototype.toString;
     let arrType = "[object Array]";
@@ -336,26 +344,34 @@ export function deepClone(target, type) {
 }
 
 /**
- * @description: 合并两个对象
- * @param {*} tar1 对象1
- * @param {*} tar2 对象2
- * @return {*} 合并结果
+ * @description: 合并两个对象，返回新对象
+ * @param {object} tar1 对象1
+ * @param {object} tar2 对象2
+ * @return {object} 合并结果
+ * @example
+ * const tar1 = { name: "王花花", age: 18, gender: 0 };
+ * const tar2 = { name: "黎明花", age: 20, like: "code" };
+ * const res = mergeParams(tar1, tar2);
+ * // {name: '黎明花', age: 20, gender: 0, like: 'code'}
  */
-export function mergeParams(tar, tar2) {
-  return Object.assign(tar, tar2);
+export function mergeParams(tar1, tar2) {
+  tar1 = JSON.parse(JSON.stringify(tar1));
+  return Object.assign(tar1, tar2);
 }
 
 /**
  * @description: 选出指定字段值
- * @param {object} data 目标对象
+ * @param {object} params 目标对象
  * @param {array} keyArr 键值数组
  * @return {object} 结果对象
+ * @example
+ * const res = pickParams(obj, ["name", "age"]); // {name: '', age: 18}
  */
-export function pickParams(data, keyArr) {
+export function pickParams(params, keyArr) {
   let result = {};
   for (let i = 0; i < keyArr.length; i++) {
     const key = keyArr[i];
-    result[key] = data[key];
+    result[key] = params[key];
   }
   return result;
 }
@@ -363,9 +379,12 @@ export function pickParams(data, keyArr) {
 /* ===================================== 数组 ===================================== */
 
 /**
- * @description: 数组去重
+ * @description: 普通数组去重
  * @param {array}  目标对象.
  * @return {array} 去重后的数组
+ * @example
+ * const arr = [1, 2, 1, 3, 4, 1, 2, [22, 23]];
+ * const res = dedupeArr(arr) // [1, 2, 3, 4, [22, 23]]
  */
 export function dedupeArr(arr) {
   return Array.from(new Set(arr));
@@ -376,6 +395,10 @@ export function dedupeArr(arr) {
  * @param {array}  目标对象.
  * @param {string}  键.
  * @return {array} 去重后的数组
+ * @example
+ * const arr = [{ name: "王花花", age: 18 }, { name: "黎明花" }, { name: "王花花", age: 20 }];
+ * const res = dedupeArrByKey(arr, "name");
+ * // [{ name: "王花花", age: 18 }, { name: "黎明花" }]
  */
 export function dedupeArrByKey(arr, key) {
   const res = new Map();
@@ -387,6 +410,9 @@ export function dedupeArrByKey(arr, key) {
  * @description: 扁平化普通数组;
  * @param {array} arr 目标数组
  * @return {array} 扁平后数组
+ * @example
+ * const arr = [1, 2, 3, [22, 23, [5, 6]]];
+ * const res = flatArr(arr); // [1, 2, 3, 22, 23, 5, 6]
  */
 export const flatArr = function (arr) {
   return arr.reduce((pre, cur) => {
@@ -395,12 +421,17 @@ export const flatArr = function (arr) {
 };
 
 /**
- * @description: 获取多个数组的交集
+ * @description: 找出多个普通数组的交集
  * @param {array} arr
  * @param {array} ...arrs
  * @return {array}
+ * @example
+ * const arr1 = [1, 2, 3, 4];
+ * const arr2 = [1, 3, 6];
+ * const arr3 = [2, 3, 7];
+ * const res = findIntersection(arr1, arr2, arr3); // [3]
  */
-export function getIntersection(arr, ...arrs) {
+export function findIntersection(arr, ...arrs) {
   return [...new Set(arr)].filter((item) => {
     return arrs.every((v) => {
       return v.includes(item);
@@ -412,7 +443,10 @@ export function getIntersection(arr, ...arrs) {
  * @description: 找出数组中的峰值
  * @param {array} arr 目标对象
  * @param {string} type 峰值朝向 up | down
- * @return {array}  返回峰值
+ * @return {array}  返回峰值集合[]
+ * @example
+ * const arr1 = [1, 27, 3, 4, 5, 12, 21, 34, 55, 16, 7, 123, 6, 73];
+ * const res = findPeak(arr1); // [27, 55, 123]
  */
 export function findPeak(arr, type = "up") {
   let prev, peak, next;
@@ -438,7 +472,11 @@ export function findPeak(arr, type = "up") {
  * @param {array} arr 目标对象
  * @param {string} arr 键名
  * @param {string} type 峰值朝向 up | down
- * @return {array} []
+ * @return {array} 返回峰值集合[]
+ * @example
+ * const arr = [{ age: 12 }, { age: 23 }, { age: 20 }, { age: 28 }, { age: 17 }, { age: 25 }];
+ * const res = findPeakByKey(arr, "age");
+ * // [{ age: 23 }, { age: 28 }];
  */
 export function findPeakByKey(arr, key, type = "up") {
   let prev, peak, next;
@@ -461,11 +499,14 @@ export function findPeakByKey(arr, key, type = "up") {
 }
 
 /**
- * @Author: Jia sen
  * @description: 数组分段函数
  * @param {Array} arr 原数组
  * @param {Number} len 拆分长度
- * @return {*}
+ * @return {*} 拆分结果
+ * @example
+ * const arr = ["a", "b", "c", "d", "e", "f", "g"];
+ * const res = chunkArr(arr, 2);
+ * // [["a", "b"], ["c", "d"], ["e", "f"], ["g"]]
  */
 export function chunkArr(arr, len) {
   const result = [];
@@ -483,7 +524,7 @@ export function chunkArr(arr, len) {
  * const arr = [1,3,5,4,2]
  * sortArr(arr, false) // [1,2,3,4,5]
  */
-export function sortArr(arr, sortAsc) {
+export function sortArr(arr, sortAsc = false) {
   let sortArr = [];
   sortArr = arr.sort((a, b) => {
     if (sortAsc) {
@@ -502,9 +543,9 @@ export function sortArr(arr, sortAsc) {
  * @return {array}
  * @example
  * const arr = [{ name: '小李', age: 15 }, { name: '小红', age: 25 }, { name: '小明', age: 19 }]
- * sortByKey(arr, 'age') // [{ name: '小李', age: 15 }, { name: '小明', age: 19 }, { name: '小红', age: 25 }]
+ * sortArrByKey(arr, 'age') // [{ name: '小李', age: 15 }, { name: '小明', age: 19 }, { name: '小红', age: 25 }]
  */
-export function sortArrByKey(arr, key, sortAsc = true) {
+export function sortArrByKey(arr, key, sortAsc = false) {
   let sortArr = [];
   sortArr = arr.sort((a, b) => {
     if (sortAsc) {
@@ -518,19 +559,23 @@ export function sortArrByKey(arr, key, sortAsc = true) {
 
 /**
  * @description: 数组中最大的数
+ * @example
+ * arrMax([1,4,3,5,2]) // 5
  */
 export function arrMax(arr) {
   return arr.reduce((pre, cur) => {
     return cur > pre ? cur : pre;
-  }, 0);
+  }, arr[0]);
 }
 /**
  * @description: 数组中最小的数
+ * @example
+ * arrMax([1,4,3,5,2]) // 1
  */
 export function arrMin(arr) {
   return arr.reduce((pre, cur) => {
     return cur < pre ? cur : pre;
-  }, 0);
+  }, arr[0]);
 }
 
 /**
@@ -538,10 +583,13 @@ export function arrMin(arr) {
  * @param {Array} arr 数组
  * @param {string} key 键名
  * @return {*} 第一个最大值的一项
+ * @example
+ * const arr4 = [{ age: 12 }, { age: 23 }, { age: 20 }];
+ * console.log(arrMaxByKey(arr4, "age")); // {age: 23}
  */
 export function arrMaxByKey(arr, key) {
   return arr.reduce((pre, cur) => {
-    return cur[key] < pre.age ? cur : pre;
+    return cur[key] > pre.age ? cur : pre;
   }, arr[0]);
 }
 /**
@@ -549,6 +597,9 @@ export function arrMaxByKey(arr, key) {
  * @param {Array} arr 数组
  * @param {string} key 键名
  * @return {*} 第一个最小值的一项
+ * @example
+ * const arr4 = [{ age: 12 }, { age: 23 }, { age: 20 }];
+ * console.log(arrMinByKey(arr4, "age")); // {age: 12}
  */
 export function arrMinByKey(arr, key) {
   return arr.reduce((pre, cur) => {
@@ -557,14 +608,14 @@ export function arrMinByKey(arr, key) {
 }
 /* ===================================== 树结构 ===================================== */
 /**
- * @description: 查找所有父节点的id(key)
+ * @description: 查找所有上层节点的id(key)
  * @param {*} array 目标对象
  * @param {*} value 查找值
  * @param {*} valueKey 查找值对应的key
  * @param {*} childrenKey 目标对象中子级的的key
  * @return {*} 父节点键值集合
  */
-export function findParent(array, value, valueKey = "value", childrenKey = "children") {
+export function findParentKey(array, value, valueKey = "id", childrenKey = "children") {
   if (!array || !Array.isArray(array)) return;
   const result = [];
   let valid = false;
@@ -575,9 +626,9 @@ export function findParent(array, value, valueKey = "value", childrenKey = "chil
         let val = v[valueKey];
         let child = v[childrenKey];
         if (val == value) {
+          console.log(val, value);
           valid = true; // 验证存在匹配的子节点
           parentValue = lastValue; // 当找到匹配的后，证明传进来的这个节点就是 原来节点的上一级节点
-          return;
         } else {
           child && child.length && loopUp(child, value, val);
         }
@@ -585,21 +636,21 @@ export function findParent(array, value, valueKey = "value", childrenKey = "chil
     };
     loopUp(array, value);
     if (parentValue) {
-      result.shift(parentValue);
+      result.unshift(parentValue);
       loop(array, parentValue);
     }
   };
   loop(array, value);
-  return valid ? [...result, value] : [];
+  return valid ? [...result] : [];
 }
 /**
- * @description: 查找所有子节点的id(key)
+ * @description: 查找节点
  * @param {*} array 目标对象
  * @param {*} value 查找值
  * @param {*} valueKey 查找值对应的key
  * @param {*} childrenKey 目标对象中子级的的key * @return {*} 子节点键值集合
  */
-export function findChild(array, value, valueKey = "value", childrenKey = "children") {
+export function findNode(array, value, valueKey = "id", childrenKey = "children") {
   let node = null;
   const loop = (array, value) => {
     array.forEach((v) => {
@@ -617,47 +668,29 @@ export function findChild(array, value, valueKey = "value", childrenKey = "child
 /**
  * @description: 扁平化数组
  * @param {array} arr 目标对象
- * @param {string} key 键名
+ * @param {string} childrenKey 子节点键名
  * @return {array} 扁平后的结果
  */
-export function flatTree(arr, key) {
+export function flatTree(arr, childrenKey = "children") {
   let result = [];
   arr.forEach((v) => {
     result = result.concat(v);
-    if (Array.isArray(v[key]) && v[key].length) {
-      result = result.concat(flatArr(v[key], key));
+    if (Array.isArray(v[childrenKey]) && v[childrenKey].length) {
+      result = result.concat(flatArr(v[childrenKey], childrenKey));
     }
   });
   return result;
 }
-/**
- * @description: 将扁平化的数组转化为树结构
- * @param {*} arr 数组
- * @param {*} parentIdKey 父级Id键名
- * @param {*} parentId 父级Id
- * @return {*}
- */
-export function toTree(arr, parentIdKey, parentId = null) {
-  const tree = [];
 
-  arr.forEach((item) => {
-    if (item[parentIdKey] === parentId) {
-      const children = arrayToTree(arr, parentIdKey, item.id);
-      if (children.length) {
-        item.children = children;
-      }
-      tree.push(item);
-    }
-  });
-
-  return tree;
-}
 /* ===================================== 格式转换 ===================================== */
 
 /**
- * @description: 数组转对象
- * @param {*} arr 目标数组[{a: 14, b: 22}, {a: 21, b: 31}]
- * @return {*} {a: [14, 21], b: [22, 31]}
+ * @description: 数组转对象，以对象属性，统计数组对象中每一项的属性值
+ * @param {*} arr 目标数组
+ * @return {*} result
+ * @example
+ * const arr = [{ a: 14, b: 22 },{ a: 21, b: 31 }]
+ * const res = arrayToObject(arr); // {a: [14, 21], b: [22, 31]}
  */
 export function arrayToObject(arr) {
   let result = {};
@@ -665,7 +698,7 @@ export function arrayToObject(arr) {
     Object.entries(item).forEach((v) => {
       const key = v[0];
       const value = v[1];
-      result.push({ [key]: [] });
+      result[key] = result[key] ? [...result[key]] : [];
       if (result[key] && result[key].length) {
         result[key].push(value);
       } else {
@@ -729,7 +762,7 @@ export function formDataToJson(formData) {
 /**
  * 控制台打印formData键对值
  */
-export function consoleFormData() {
+export function consoleFormData(formData) {
   for (const [key, value] of formData.entries()) {
     console.log(`${key}: ${value}`);
   }
@@ -781,7 +814,7 @@ export function setCookie(name, value, days) {
  */
 export function removeCookie(name) {
   // 设置已过期，系统会立刻删除cookie
-  this.setCookie(name, "1", -1);
+  setCookie(name, "1", -1);
 }
 /**
  * @description: 根据name判断cookie是否为空
@@ -806,13 +839,28 @@ export async function isEmptyCookieAsync(name) {
   let res = await cookieStore.get(name);
   return !res;
 }
-/* ===================================== 测试 ===================================== */
 
 export default {
-  padleft,
-  htmlEscape,
-  /* ===================================== 对象 ===================================== */
+  /* ===================================== 判断 ===================================== */
+  typeOf,
+  isObject,
+  isArray,
+  isString,
+  isNumber,
+  isJson,
   isEmptyObject,
+  isEmptyArray,
+  /* ===================================== 基本计算 ===================================== */
+  add,
+  subtract,
+  divide,
+  multiply,
+  /* ===================================== 字符串 ===================================== */
+  padLeft,
+  htmlEscape,
+  textHighlight,
+  sliceStr,
+  /* ===================================== 对象 ===================================== */
   clearEmptyParams,
   setDefaultParams,
   replaceKeys,
@@ -824,20 +872,26 @@ export default {
   dedupeArr,
   dedupeArrByKey,
   flatArr,
-  getIntersection,
+  findIntersection,
   findPeak,
   findPeakByKey,
   chunkArr,
+  sortArr,
+  sortArrByKey,
   arrMax,
   arrMin,
   arrMaxByKey,
   arrMinByKey,
-  /* ===================================== 数组对象 ===================================== */
+  /* ===================================== 树结构 ===================================== */
+  findParentKey,
+  findNode,
+  flatTree,
+  /* ===================================== 格式转化 ===================================== */
   arrayToObject,
   objectToArray,
-  findParent,
-  findChild,
-  flatTree,
+  jsonToFormData,
+  formDataToJson,
+  consoleFormData,
   /* ===================================== 存储 ===================================== */
   isEmptyStorage,
   getCookie,

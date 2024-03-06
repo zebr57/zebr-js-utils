@@ -47,14 +47,14 @@ export function isJson(data = null) {
  * @description: 是否为空对象
  */
 export function isEmptyObject(obj) {
-  if (!isObject()) return false;
+  if (!isObject(obj)) return false;
   return !Object.keys(obj).length;
 }
 /**
  * @description: 是否为空数组
  */
 export function isEmptyArray(arr) {
-  if (!isArray()) return false;
+  if (!isArray(arr)) return false;
   return !Object.keys(arr).length;
 }
 
@@ -66,7 +66,6 @@ export default {
   isString,
   isNumber,
   isJson,
-  typeOf,
   isEmptyObject,
   isEmptyArray,
 };
